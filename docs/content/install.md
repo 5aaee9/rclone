@@ -125,9 +125,9 @@ The simplest fix is to run
 Fetch the correct binary for your processor type by clicking on these
 links. If not sure, use the first link.
 
-- [Intel/AMD - 64 Bit](https://downloads.rclone.org/rclone-current-linux-amd64.zip)
-- [Intel/AMD - 32 Bit](https://downloads.rclone.org/rclone-current-linux-386.zip)
-- [ARM - 64 Bit](https://downloads.rclone.org/rclone-current-linux-arm64.zip)
+- [Intel/AMD - 64 Bit](https://downloads.rclone.org/rclone-current-windows-amd64.zip)
+- [Intel/AMD - 32 Bit](https://downloads.rclone.org/rclone-current-windows-386.zip)
+- [ARM - 64 Bit](https://downloads.rclone.org/rclone-current-windows-arm64.zip)
 
 Open this file in the Explorer and extract `rclone.exe`. Rclone is a
 portable executable so you can place it wherever is convenient.
@@ -141,6 +141,19 @@ does not launch a GUI by default, it runs in the CMD Window.
 If you are planning to use the [rclone mount](/commands/rclone_mount/)
 feature then you will need to install the third party utility
 [WinFsp](https://winfsp.dev/) also.
+
+### Windows package manager (Winget) {#windows-chocolatey}
+
+[Winget](https://learn.microsoft.com/en-us/windows/package-manager/) comes pre-installed with the latest versions of Windows. If not, update the [App Installer](https://www.microsoft.com/p/app-installer/9nblggh4nns1) package from the Microsoft store.
+
+To install rclone
+```
+winget install Rclone.Rclone
+```
+To uninstall rclone
+```
+winget uninstall Rclone.Rclone --force
+```
 
 ### Chocolatey package manager {#windows-chocolatey}
 
@@ -164,6 +177,19 @@ Note that this is a third party installer not controlled by the rclone
 developers so it may be out of date. Its current version is as below.
 
 [![Chocolatey package](https://repology.org/badge/version-for-repo/chocolatey/rclone.svg)](https://repology.org/project/rclone/versions)
+
+### Scoop package manager {#windows-scoop}
+
+Make sure you have [Scoop](https://scoop.sh/) installed
+
+```
+scoop install rclone
+```
+
+Note that this is a third party installer not controlled by the rclone
+developers so it may be out of date. Its current version is as below.
+
+[![Scoop package](https://repology.org/badge/version-for-repo/scoop/rclone.svg)](https://repology.org/project/rclone/versions)
 
 ## Package manager installation {#package-manager}
 
@@ -237,10 +263,16 @@ Here are some commands tested on an Ubuntu 18.04.3 host:
 # config on host at ~/.config/rclone/rclone.conf
 # data on host at ~/data
 
+# add a remote interactively
+docker run --rm -it \
+    --volume ~/.config/rclone:/config/rclone \
+    --user $(id -u):$(id -g) \
+    rclone/rclone \
+    config
+
 # make sure the config is ok by listing the remotes
 docker run --rm \
     --volume ~/.config/rclone:/config/rclone \
-    --volume ~/data:/data:shared \
     --user $(id -u):$(id -g) \
     rclone/rclone \
     listremotes
@@ -312,9 +344,10 @@ go build -trimpath -ldflags -s -tags cmount
 ```
 
 Instead of executing the `go build` command directly, you can run it via the
-Makefile, which also sets version information and copies the resulting rclone
-executable into your GOPATH bin folder (`$(go env GOPATH)/bin`, which
-corresponds to `~/go/bin/rclone` by default).
+Makefile. It changes the version number suffix from "-DEV" to "-beta" and
+appends commit details. It also copies the resulting rclone executable into
+your GOPATH bin folder (`$(go env GOPATH)/bin`, which corresponds to
+`~/go/bin/rclone` by default).
 
 ```
 make
@@ -326,7 +359,15 @@ To include mount command on macOS and Windows with Makefile build:
 make GOTAGS=cmount
 ```
 
-As an alternative you can download the source, build and install rclone in one
+There are other make targets that can be used for more advanced builds,
+such as cross-compiling for all supported os/architectures, embedding
+icon and version info resources into windows executable, and packaging
+results into release artifacts.
+See [Makefile](https://github.com/rclone/rclone/blob/master/Makefile)
+and [cross-compile.go](https://github.com/rclone/rclone/blob/master/bin/cross-compile.go)
+for details.
+
+Another alternative is to download the source, build and install rclone in one
 operation, as a regular Go package. The source will be stored it in the Go
 module cache, and the resulting executable will be in your GOPATH bin folder
 (`$(go env GOPATH)/bin`, which corresponds to `~/go/bin/rclone` by default).
